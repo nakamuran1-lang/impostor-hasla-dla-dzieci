@@ -1,20 +1,35 @@
 <!doctype html>
-<html lang="pl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Impostor Kids</title>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Impostor Kids - Sprint 1.1</title>
 <link rel="stylesheet" href="style.css">
-</head><body>
+</head>
+<body>
 <div class="card">
 <h1>🎭 Impostor Kids</h1>
-<p>Przykład ekranu odsłaniania roli</p>
-<div id="sliderBox">
-<p>🔒 Przesuń w prawo aby zobaczyć rolę</p>
-<input type="range" id="revealSlider" min="0" max="100" value="0">
+
+<label>Gracze</label><br>
+<select id="playerCount"></select>
+
+<div id="players"></div>
+
+<label>Czas rundy</label><br>
+<select id="roundTime">
+<option value="120">2 min</option>
+<option value="180">3 min</option>
+<option value="300">5 min</option>
+</select>
+
+<br><br>
+
+<button id="startBtn">▶️ Start</button>
+<button id="clearBtn">🗑️ Wyczyść dane</button>
+
+<div id="message"></div>
 </div>
-<div id="role" style="display:none">
-<h2>📚 Zwierzęta</h2>
-<h1>🔑 PIES</h1>
-</div>
-</div>
+
 <script src="app.js"></script>
-</body></html>
+</body>
+</html>
