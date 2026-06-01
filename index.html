@@ -1,12 +1,16 @@
-<!DOCTYPE html>
-<html lang="pl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Impostor Kids 4.0</title>
-<link rel="stylesheet" href="style.css">
+<!doctype html><html lang='pl'><head>
+<meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Impostor Kids</title><link rel='stylesheet' href='style.css'>
 </head><body>
-<h1>🎭 Impostor Kids 4.0</h1>
-<p>Projekt startowy v4.0</p>
-<p>Wgraj wszystkie pliki do repozytorium GitHub Pages.</p>
-<script src="words.js"></script>
-<script src="app.js"></script>
-</body></html>
+<div id=s1 class=card><h1>🎭 Impostor Kids</h1>
+<label>Gracze:</label><select id=count></select><div id=players></div>
+<label>Czas:</label><select id=time><option value=120>2 min</option><option value=180 selected>3 min</option><option value=300>5 min</option></select><br>
+<button onclick='startGame()'>Start</button><button onclick='clearNames()'>Wyczyść</button></div>
+
+<div id=s2 class='card hidden'><h2 id=pass></h2><button onmousedown='hold()' ontouchstart='hold()' onmouseup='cancelHold()' ontouchend='cancelHold()'>Przytrzymaj 1 sek.</button></div>
+<div id=s3 class='card hidden'><div id=role></div><button onclick='nextPlayer()'>Ukryj i dalej</button></div>
+<div id=s4 class='card hidden'><h2 id=starter></h2><h3 id=cat></h3><div id=timer class=big></div><button onclick='runTimer()'>Start odliczania</button><button onclick='voteScreen()'>Głosowanie</button></div>
+<div id=s5 class='card hidden'><h2>Kto jest impostorem?</h2><div id=votes></div></div>
+<div id=s6 class='card hidden'><h2 id=confirm></h2><button onclick='showResult()'>Pokaż wynik</button><button onclick='backVote()'>Wróć</button></div>
+<div id=s7 class='card hidden'><div id=result></div><div id=score></div><button onclick='nextRound()'>Następna runda</button></div>
+<script src='words.js'></script><script src='app.js'></script></body></html>
