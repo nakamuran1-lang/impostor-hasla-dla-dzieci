@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Impostor Kids</title>
+<style>
+body{
+font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+margin:0;padding:20px;
+min-height:100vh;
+display:flex;justify-content:center;align-items:center;
+background:#f4f4f4;
+text-align:center;
+}
+.container{width:100%;max-width:700px}
+button,select{
+font-size:24px;padding:16px 24px;
+border-radius:12px;border:none;
+margin:10px;
+}
+button{cursor:pointer}
+.card{
+background:white;
+padding:25px;
+border-radius:16px;
+box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+.hidden{display:none}
+#timer{font-size:64px;font-weight:bold;margin:20px 0}
+#roleText{font-size:40px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div id="setup" class="card">
+<h1>Impostor Kids</h1>
+<p>Liczba graczy</p>
+<select id="players">
+<option>3</option><option>4</option><option>5</option>
+<option>6</option><option>7</option><option>8</option><option>9</option>
+</select><br>
+<button onclick="startGame()">Start</button>
+</div>
+
+<div id="game" class="card hidden">
+<h2 id="playerLabel"></h2>
+<button onclick="showRole()">Pokaż moją rolę</button>
+<div id="roleCard" class="hidden">
+<h2 id="roleText"></h2>
+<button onclick="nextPlayer()">Ukryj i przekaż dalej</button>
+</div>
+</div>
+
+<div id="round" class="card hidden">
+<h1>Runda trwa</h1>
+<div id="timer">03:00</div>
+<button onclick="finishRound()">Koniec rundy i głosowanie</button>
+</div>
+
+<div id="vote" class="card hidden">
+<h1>GŁOSOWANIE</h1>
+<p>Wskażcie impostora.</p>
+<button onclick="location.reload()">Nowa gra</button>
+</div>
+
+</div>
+
+<script>
+const words=[
+"pies","kot","krowa","koń","lew","tygrys","słoń","żyrafa","zebra","małpa",
+"królik","mysz","żółw","kura","kogut","kaczka","gęś","owca","koza","świnia",
+"jabłko","banan","gruszka","truskawka","malina","arbuz","pomarańcza","cytryna","winogrono","śliwka",
+"pizza","hamburger","frytki","lody","cukierek","czekolada","kanapka","makaron","naleśnik","zupa",
+"samochód","autobus","rower","pociąg","samolot","helikopter","traktor","motor","statek","rakieta",
+"piłka","huśtawka","zjeżdżalnia","klocki","lalka","pluszak","skakanka","rolki","hulajnoga","balon",
+"szkoła","przedszkole","plac zabaw","basen","las","plaża","góry","dom","zamek","ogród",
+"mama","tata","babcia","dziadek","siostra","brat","kolega","nauczyciel","lekarz","strażak",
+"policjant","król","królewna","pirat","rycerz","czarodziej","smok","robot","dinozaur","jednorożec",
+"słońce","księżyc","gwiazda","chmura","deszcz","śnieg","tęcza","wiatr","morze","rzeka"
+];
+
+let roles=[];
+let current=0;
+let countdown;
+
+function startGame(){
+ let n=parseInt(document.getElementById('players').value);
+ let word=words[Math.floor(Math.random()*words.length)];
+ let imp=Math.floor(Math.random()*n);
+
+ roles=[];
+ for(let i=0;i<n;i++) roles.push(i===imp?"IMPOSTOR":word);
+
+ document.getElementById('setup').classList.add('hidden');
+ document.getElementById('game').classList.remove('hidden');
+ document.getElementById('playerLabel').innerText='Gracz '+(current+1);
+}
+
+function showRole(){
+ document.getElementById('roleCard').classList.remove('hidden');
+ let r=roles[current];
+ document.getElementById('roleText').innerText=(r==="IMPOSTOR")?"Jesteś IMPOSTOREM!":"Hasło: "+r;
+}
+
+function nextPlayer(){
+ document.getElementById('roleCard').classList.add('hidden');
+ current++;
+ if(current>=roles.length){
+   document.getElementById('game').classList.add('hidden');
+   document.getElementById('round').classList.remove('hidden');
+   startTimer();
+ }else{
+   document.getElementById('playerLabel').innerText='Gracz '+(current+1);
+ }
+}
+
+function startTimer(){
+ let time=180;
+ update(time);
+ countdown=setInterval(()=>{
+   time--;
+   update(time);
+   if(time<=0){
+      clearInterval(countdown);
+      finishRound();
+   }
+ },1000);
+}
+
+function update(t){
+ let m=String(Math.floor(t/60)).padStart(2,'0');
+ let s=String(t%60).padStart(2,'0');
+ document.getElementById('timer').innerText=m+":"+s;
+}
+
+function finishRound(){
+ clearInterval(countdown);
+ document.getElementById('round').classList.add('hidden');
+ document.getElementById('vote').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
