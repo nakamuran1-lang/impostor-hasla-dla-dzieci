@@ -1,6 +1,4 @@
 
-body{font-family:Arial,sans-serif;max-width:800px;margin:auto;padding:15px;background:#f4f4f4;text-align:center}
-.card{background:white;padding:16px;border-radius:12px;margin:10px 0}
-button,input,select{font-size:20px;padding:10px;margin:5px}
-.hidden{display:none} table{margin:auto;border-collapse:collapse}td,th{border:1px solid #ccc;padding:6px}
-.big{font-size:32px;font-weight:bold}
+body{font-family:Arial;padding:20px;background:#f4f4f4;text-align:center}
+.card{background:white;padding:20px;border-radius:12px;max-width:700px;margin:auto}
+input[type=range]{width:90%;height:40px}
