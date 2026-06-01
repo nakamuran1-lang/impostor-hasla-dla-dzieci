@@ -1,83 +1,68 @@
 
 const pc=document.getElementById('playerCount');
 for(let i=3;i<=9;i++) pc.innerHTML+=`<option>${i}</option>`;
-pc.value=localStorage.getItem('playerCount')||4;
+pc.value=localStorage.playerCount||4;
+function render(){players.innerHTML='';for(let i=0;i<pc.value;i++)players.innerHTML+=`<input id=p${i} value="${localStorage['p'+i]||''}" placeholder="Imię ${i+1}"><br>`;}
+pc.onchange=render;render();
 
-function renderPlayers(){
- const d=document.getElementById('players');
- d.innerHTML='';
- for(let i=0;i<pc.value;i++){
-  d.innerHTML+=`<input id="p${i}" value="${localStorage.getItem('p'+i)||''}" placeholder="Imię ${i+1}"><br>`;
- }
-}
-renderPlayers();
-pc.onchange=renderPlayers;
+let playersArr=[],roles=[],current=0,starterPlayer='',voteChoice='',cat='',timerId;
 
-let players=[],roles=[],current=0;
-
-document.getElementById('startBtn').onclick=()=>{
- players=[];
- for(let i=0;i<pc.value;i++){
-   let v=document.getElementById('p'+i).value||('Gracz '+(i+1));
-   localStorage.setItem('p'+i,v);
-   players.push(v);
- }
- localStorage.setItem('playerCount',pc.value);
-
- const cats=Object.keys(WORDS);
- const cat=cats[Math.floor(Math.random()*cats.length)];
- const word=WORDS[cat][Math.floor(Math.random()*WORDS[cat].length)];
- const imp=Math.floor(Math.random()*players.length);
-
- roles=players.map((p,i)=>({
-   cat, word, impostor:i===imp
- }));
-
- current=0;
- document.getElementById('setup').classList.add('hidden');
- showPass();
+startBtn.onclick=()=>{
+playersArr=[];
+for(let i=0;i<pc.value;i++){let n=document.getElementById('p'+i).value||('Gracz '+(i+1));playersArr.push(n);localStorage['p'+i]=n;}
+localStorage.playerCount=pc.value;
+const cats=Object.keys(WORDS); cat=cats[Math.floor(Math.random()*cats.length)];
+const word=WORDS[cat][Math.floor(Math.random()*WORDS[cat].length)];
+const imp=Math.floor(Math.random()*playersArr.length);
+roles=playersArr.map((n,i)=>({imp:i===imp,word,cat}));
+current=0;
+setup.classList.add('hidden'); showPass();
 };
 
-function showPass(){
- document.getElementById('passScreen').classList.remove('hidden');
- document.getElementById('roleScreen').classList.add('hidden');
- document.getElementById('hiddenRole').classList.add('hidden');
- document.getElementById('passText').innerText='📱 Przekaż telefon: '+players[current];
- document.getElementById('slider').value=0;
-}
+function showPass(){passScreen.classList.remove('hidden'); roleScreen.classList.add('hidden'); hiddenRole.classList.add('hidden'); passText.innerText='📱 Przekaż telefon: '+playersArr[current]; slider.value=0;}
+slider.addEventListener('input',function(){if(+this.value>=95){let r=roles[current];passScreen.classList.add('hidden');roleScreen.classList.remove('hidden');roleContent.innerHTML=r.imp?`<div class=impostor><h2>${r.cat}</h2><h1>🚨 JESTEŚ IMPOSTOREM</h1></div>`:`<div class=normal><h2>${r.cat}</h2><h1>${r.word}</h1></div>`;}});
+hideBtn.onclick=()=>{roleScreen.classList.add('hidden');hiddenRole.classList.remove('hidden');}
+showAgainBtn.onclick=()=>{hiddenRole.classList.add('hidden');roleScreen.classList.remove('hidden');}
+function nextP(){current++; if(current>=playersArr.length){roleScreen.classList.add('hidden');hiddenRole.classList.add('hidden');readyScreen.classList.remove('hidden');} else showPass();}
+nextBtn.onclick=nextP; nextBtn2.onclick=nextP;
 
-document.getElementById('slider').addEventListener('input',function(){
- if(parseInt(this.value)>=95){
-   let r=roles[current];
-   document.getElementById('passScreen').classList.add('hidden');
-   document.getElementById('roleScreen').classList.remove('hidden');
-
-   document.getElementById('roleContent').innerHTML=r.impostor
-   ? `<div class="impostor"><h2>📚 ${r.cat}</h2><h1>🚨 JESTEŚ IMPOSTOREM</h1></div>`
-   : `<div class="normal"><h2>📚 ${r.cat}</h2><h1>🔑 ${r.word}</h1></div>`;
- }
-});
-
-document.getElementById('hideBtn').onclick=()=>{
- document.getElementById('roleScreen').classList.add('hidden');
- document.getElementById('hiddenRole').classList.remove('hidden');
+startRoundBtn.onclick=()=>{
+readyScreen.classList.add('hidden'); roundScreen.classList.remove('hidden');
+starterPlayer=playersArr[Math.floor(Math.random()*playersArr.length)];
+starter.innerText='🎲 Zaczyna: '+starterPlayer;
+category.innerText='📚 Kategoria: '+cat;
+let d=+roundTime.value; timer.innerText=String(Math.floor(d/60)).padStart(2,'0')+':00';
 };
 
-document.getElementById('showAgainBtn').onclick=()=>{
- document.getElementById('hiddenRole').classList.add('hidden');
- document.getElementById('roleScreen').classList.remove('hidden');
+timerBtn.onclick=()=>{
+let t=+roundTime.value;
+clearInterval(timerId);
+timerId=setInterval(()=>{
+let m=Math.floor(t/60), s=t%60;
+timer.innerText=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+t--;
+if(t<0){showVote();}
+},1000);
 };
 
-function nextPlayer(){
- current++;
- if(current>=players.length){
-   document.getElementById('roleScreen').classList.add('hidden');
-   document.getElementById('hiddenRole').classList.add('hidden');
-   document.getElementById('readyScreen').classList.remove('hidden');
- }else{
-   showPass();
- }
+function showVote(){
+clearInterval(timerId);
+roundScreen.classList.add('hidden');
+voteScreen.classList.remove('hidden');
+voteList.innerHTML='';
+playersArr.forEach(p=>voteList.innerHTML+=`<button onclick="pickVote('${p}')">${p}</button><br>`);
 }
+voteBtn.onclick=showVote;
 
-document.getElementById('nextBtn').onclick=nextPlayer;
-document.getElementById('nextBtn2').onclick=nextPlayer;
+window.pickVote=(p)=>{
+voteChoice=p;
+voteScreen.classList.add('hidden');
+confirmScreen.classList.remove('hidden');
+confirmText.innerText='Głosujecie na: '+p+' ?';
+}
+backBtn.onclick=()=>{confirmScreen.classList.add('hidden');voteScreen.classList.remove('hidden');}
+showResultBtn.onclick=()=>{
+confirmScreen.classList.add('hidden');
+resultScreen.classList.remove('hidden');
+resultText.innerText='Wybrano: '+voteChoice;
+}

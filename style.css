@@ -7,3 +7,4 @@ input[type=range]{width:90%}
 *{user-select:none;-webkit-user-select:none}
 .impostor{background:#ffdddd;padding:10px;border-radius:10px}
 .normal{background:#ddffdd;padding:10px;border-radius:10px}
+.timer{font-size:40px;font-weight:bold}

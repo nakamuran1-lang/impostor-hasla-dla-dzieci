@@ -1,40 +1,37 @@
 <!doctype html><html lang="pl"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Impostor Kids Sprint 1.2</title>
+<title>Impostor Kids Sprint 1.3</title>
 <link rel="stylesheet" href="style.css"></head><body>
 
 <div id="setup" class="card">
 <h1>🎭 Impostor Kids</h1>
-<label>Gracze</label><br>
 <select id="playerCount"></select>
 <div id="players"></div>
+<select id="roundTime"><option value="120">2 min</option><option value="180" selected>3 min</option><option value="300">5 min</option></select><br>
 <button id="startBtn">▶️ Start</button>
 </div>
 
-<div id="passScreen" class="card hidden">
-<h2 id="passText"></h2>
-<p>🔒 Przesuń aby zobaczyć rolę</p>
-<input type="range" min="0" max="100" value="0" id="slider">
-</div>
-
-<div id="roleScreen" class="card hidden">
-<div id="roleContent"></div>
-<button id="hideBtn">🙈 Ukryj rolę</button>
-<button id="nextBtn">➡️ Następny gracz</button>
-</div>
-
-<div id="hiddenRole" class="card hidden">
-<h2>🙈 Rola ukryta</h2>
-<button id="showAgainBtn">👁️ Pokaż ponownie</button>
-<button id="nextBtn2">➡️ Następny gracz</button>
-</div>
+<div id="passScreen" class="card hidden"><h2 id="passText"></h2><p>🔒 Przesuń aby zobaczyć rolę</p><input type="range" id="slider" min="0" max="100" value="0"></div>
+<div id="roleScreen" class="card hidden"><div id="roleContent"></div><button id="hideBtn">🙈 Ukryj rolę</button><button id="nextBtn">➡️ Następny gracz</button></div>
+<div id="hiddenRole" class="card hidden"><h2>🙈 Rola ukryta</h2><button id="showAgainBtn">👁️ Pokaż ponownie</button><button id="nextBtn2">➡️ Następny gracz</button></div>
 
 <div id="readyScreen" class="card hidden">
 <h1>🎭 Wszyscy gotowi?</h1>
-<button>▶️ Rozpocznij rundę</button>
-<button onclick="location.reload()">⚙️ Wróć do ustawień</button>
+<button id="startRoundBtn">▶️ Rozpocznij rundę</button>
 </div>
 
-<script src="words.js"></script>
-<script src="app.js"></script>
-</body></html>
+<div id="roundScreen" class="card hidden">
+<h2 id="starter"></h2>
+<h3 id="category"></h3>
+<div id="timer" class="timer"></div>
+<button id="timerBtn">▶️ Start odliczanie</button>
+<button id="voteBtn">🗳️ Przejdź do głosowania</button>
+</div>
+
+<div id="voteScreen" class="card hidden"><h2>Kto jest impostorem?</h2><div id="voteList"></div></div>
+
+<div id="confirmScreen" class="card hidden"><h2 id="confirmText"></h2><button id="showResultBtn">✅ Pokaż wynik</button><button id="backBtn">↩️ Wróć</button></div>
+
+<div id="resultScreen" class="card hidden"><h2>✅ Sprint 1.3 zaliczony</h2><div id="resultText"></div></div>
+
+<script src="words.js"></script><script src="app.js"></script></body></html>
