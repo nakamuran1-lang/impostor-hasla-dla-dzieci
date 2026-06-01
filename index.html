@@ -1,198 +1,118 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Impostor Kids 2.0</title>
+<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Impostor Kids 3.0</title>
 <style>
-body{font-family:Arial,sans-serif;max-width:700px;margin:auto;padding:15px;text-align:center}
-input,select,button{font-size:20px;padding:10px;margin:5px}
+body{font-family:Arial;max-width:800px;margin:auto;padding:15px;text-align:center}
+input,select,button{font-size:18px;padding:10px;margin:4px}
+table{margin:auto;border-collapse:collapse}td,th{border:1px solid #ccc;padding:6px}
 .hidden{display:none}
-.card{border:1px solid #ddd;border-radius:12px;padding:15px;margin-top:10px}
-#timer{font-size:56px;font-weight:bold}
-</style>
-</head>
-<body>
-
+</style></head><body>
+<h1>🎭 Impostor Kids 3.0</h1>
 <div id="setup">
-<h1>🎭 Impostor Kids</h1>
-
-<label>Liczba graczy:</label>
-<select id="playerCount" onchange="generateNames()">
-<option>3</option><option>4</option><option>5</option>
-<option>6</option><option>7</option><option>8</option><option>9</option>
-</select>
-
-<div id="names"></div>
-
-<label>Kategoria:</label>
-<select id="category">
-<option>Zwierzęta</option>
-<option>Jedzenie</option>
-<option>Pojazdy</option>
-<option>Sport</option>
-<option>Bajki</option>
-<option>Zabawki</option>
-</select><br>
-
-<button onclick="startGame()">START</button>
+Gracze: <select id="cnt"></select><div id="names"></div>
+Kategoria:
+<select id="cat"><option>Zwierzęta</option><option>Jedzenie</option><option>Pojazdy</option></select><br>
+<button onclick="startGame()">Start</button>
+<button onclick="localStorage.clear();location.reload()">🗑 Wyczyść graczy</button>
 </div>
 
-<div id="pass" class="hidden card">
-<h2 id="passText"></h2>
-<button onclick="showRole()">Pokaż rolę</button>
+<div id="pass" class="hidden"><h2 id="passTxt"></h2><button onclick="showRole()">Pokaż rolę</button></div>
+<div id="role" class="hidden"><h2 id="roleTxt"></h2><button onclick="nextP()">Ukryj i przekaż dalej</button></div>
+
+<div id="round" class="hidden">
+<h2 id="starter"></h2>
+<h3 id="catInfo"></h3>
+<div id="timer" style="font-size:50px">03:00</div>
+<button onclick="finish()">Koniec i głosowanie</button>
 </div>
 
-<div id="roleBox" class="hidden card">
-<h2 id="roleText"></h2>
-<button onclick="nextPlayer()">Ukryj i przekaż dalej</button>
-</div>
+<div id="vote" class="hidden"><h2>Głosowanie</h2><div id="vb"></div></div>
 
-<div id="round" class="hidden card">
-<h2 id="catInfo"></h2>
-<div id="timer">03:00</div>
-<button onclick="finishRound()">🗳️ Koniec i głosowanie</button>
-</div>
-
-<div id="vote" class="hidden card">
-<h2>Głosowanie</h2>
-<div id="voteButtons"></div>
-</div>
-
-<div id="result" class="hidden card">
-<h1>🎉 Wynik</h1>
-<h2 id="winner"></h2>
-<p id="secret"></p>
-<button onclick="location.reload()">Nowa gra</button>
+<div id="result" class="hidden">
+<h2 id="res"></h2>
+<div id="score"></div>
+<button onclick="nextRound()">🔄 Następna runda</button>
 </div>
 
 <script>
-const categories={
-"Zwierzęta":["pies","kot","lew","tygrys","słoń","żyrafa","zebra","królik"],
-"Jedzenie":["pizza","lody","hamburger","makaron","naleśnik","frytki"],
-"Pojazdy":["samochód","rower","autobus","pociąg","samolot","rakieta"],
-"Sport":["piłka","basen","tenis","rower","bieganie","bramka"],
-"Bajki":["smok","król","pirat","jednorożec","robot","rycerz"],
-"Zabawki":["klocki","lalka","pluszak","balon","hulajnoga","rolki"]
+const cats={
+"Zwierzęta":["pies","kot","lew","tygrys","żyrafa","zebra"],
+"Jedzenie":["pizza","lody","frytki","makaron","banan","hamburger"],
+"Pojazdy":["auto","rower","pociąg","rakieta","autobus","samolot"]
 };
+let names=[],scores={},roles=[],impName="",word="",cur=0,tInt;
 
-let names=[],roles=[],current=0,secretWord="",impostorName="";
-let timerInterval;
+for(let i=3;i<=9;i++) cnt.innerHTML+=`<option>${i}</option>`;
 
-function beep(freq=700,dur=150){
- const a=new(window.AudioContext||window.webkitAudioContext)();
- const o=a.createOscillator();
- const g=a.createGain();
- o.connect(g); g.connect(a.destination);
- o.frequency.value=freq;
- o.start();
- g.gain.setValueAtTime(0.1,a.currentTime);
- o.stop(a.currentTime+dur/1000);
-}
-
-function generateNames(){
- const n=parseInt(document.getElementById("playerCount").value);
- let html="";
+function renderNames(){
+ let n=+cnt.value,d='';
  for(let i=0;i<n;i++){
- html+=`<input id="n${i}" placeholder="Imię gracza ${i+1}"><br>`;
+ let v=localStorage.getItem('p'+i)||'';
+ d+=`<input id=n${i} value="${v}" placeholder="Imię ${i+1}"><br>`;
  }
- document.getElementById("names").innerHTML=html;
+ names.innerHTML=d;
 }
-generateNames();
+cnt.onchange=renderNames; cnt.value=localStorage.getItem('cnt')||4; renderNames();
+
+function saveNames(){
+ localStorage.setItem('cnt',cnt.value);
+ for(let i=0;i<+cnt.value;i++) localStorage.setItem('p'+i,document.getElementById('n'+i).value);
+}
 
 function startGame(){
- const n=parseInt(document.getElementById("playerCount").value);
-
- names=[];
- for(let i=0;i<n;i++){
- names.push(document.getElementById("n"+i).value || ("Gracz "+(i+1)));
+ saveNames();
+ names=[]; cur=0;
+ for(let i=0;i<+cnt.value;i++){
+   let n=document.getElementById('n'+i).value||('Gracz '+(i+1));
+   names.push(n);
+   if(scores[n]==null) scores[n]=0;
  }
-
- const cat=document.getElementById("category").value;
- const list=categories[cat];
- secretWord=list[Math.floor(Math.random()*list.length)];
-
- const imp=Math.floor(Math.random()*n);
- impostorName=names[imp];
-
- roles=[];
- for(let i=0;i<n;i++){
- roles.push(i===imp?"IMPOSTOR":secretWord);
- }
-
- document.getElementById("setup").classList.add("hidden");
- document.getElementById("pass").classList.remove("hidden");
- document.getElementById("passText").innerText="📱 Przekaż telefon: "+names[0];
- beep();
+ let c=cat.value;
+ word=cats[c][Math.floor(Math.random()*cats[c].length)];
+ let imp=Math.floor(Math.random()*names.length);
+ impName=names[imp];
+ roles=names.map((n,i)=>i===imp?'IMPOSTOR':word);
+ setup.classList.add('hidden'); pass.classList.remove('hidden');
+ passTxt.innerText='📱 Przekaż telefon: '+names[0];
 }
 
 function showRole(){
- document.getElementById("roleBox").classList.remove("hidden");
-
- const cat=document.getElementById("category").value;
-
- if(roles[current]==="IMPOSTOR"){
-  document.getElementById("roleText").innerHTML="🕵️ Tajna misja!<br>Kategoria: "+cat;
- }else{
-  document.getElementById("roleText").innerHTML="📚 Kategoria: "+cat+"<br><br>Hasło: "+roles[current];
- }
-
- beep(900);
+ role.classList.remove('hidden');
+ roleTxt.innerHTML=(roles[cur]=='IMPOSTOR')
+ ? '🕵️ Tajna misja!<br>Kategoria: '+cat.value
+ : '📚 '+cat.value+'<br>Hasło: '+roles[cur];
 }
 
-function nextPlayer(){
- beep(500);
- document.getElementById("roleBox").classList.add("hidden");
- current++;
-
- if(current>=names.length){
-  document.getElementById("pass").classList.add("hidden");
-  startRound();
- }else{
-  document.getElementById("passText").innerText="📱 Przekaż telefon: "+names[current];
- }
+function nextP(){
+ role.classList.add('hidden'); cur++;
+ if(cur>=names.length){
+   pass.classList.add('hidden'); round.classList.remove('hidden');
+   catInfo.innerText='Kategoria: '+cat.value;
+   starter.innerText='🎲 Zaczyna: '+names[Math.floor(Math.random()*names.length)];
+   let t=180; timer.innerText='03:00';
+   tInt=setInterval(()=>{t--; timer.innerText=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); if(t<=0) finish();},1000);
+ } else passTxt.innerText='📱 Przekaż telefon: '+names[cur];
 }
 
-function startRound(){
- document.getElementById("round").classList.remove("hidden");
- document.getElementById("catInfo").innerText="📚 Kategoria: "+document.getElementById("category").value;
-
- let t=180;
-
- timerInterval=setInterval(()=>{
- t--;
- let m=String(Math.floor(t/60)).padStart(2,"0");
- let s=String(t%60).padStart(2,"0");
- document.getElementById("timer").innerText=m+":"+s;
-
- if(t<=0){
-  beep(250,500);
-  finishRound();
- }
- },1000);
+function finish(){
+ clearInterval(tInt);
+ round.classList.add('hidden'); vote.classList.remove('hidden');
+ vb.innerHTML='';
+ names.forEach(n=> vb.innerHTML += `<button onclick="resultRound('${n}')">${n}</button><br>`);
 }
 
-function finishRound(){
- clearInterval(timerInterval);
- document.getElementById("round").classList.add("hidden");
- document.getElementById("vote").classList.remove("hidden");
-
- let html="";
- names.forEach(n=>{
- html+=`<button onclick="showResult('${n}')">${n}</button><br>`;
- });
- document.getElementById("voteButtons").innerHTML=html;
+function resultRound(voted){
+ vote.classList.add('hidden'); result.classList.remove('hidden');
+ if(voted===impName){ names.forEach(n=>{if(n!==impName) scores[n]++;}); }
+ else scores[impName]+=2;
+ res.innerHTML=`Impostor: <b>${impName}</b><br>Hasło: <b>${word}</b><br>Wybrano: <b>${voted}</b>`;
+ let h='<h3>🏆 Wyniki</h3><table><tr><th>Gracz</th><th>Pkt</th></tr>';
+ Object.keys(scores).forEach(n=> h+=`<tr><td>${n}</td><td>${scores[n]}</td></tr>`);
+ score.innerHTML=h+'</table>';
 }
 
-function showResult(voted){
- document.getElementById("vote").classList.add("hidden");
- document.getElementById("result").classList.remove("hidden");
-
- document.getElementById("winner").innerHTML="Impostorem był: <b>"+impostorName+"</b>";
- document.getElementById("secret").innerHTML="Hasło: <b>"+secretWord+"</b><br><br>Wybraliście: <b>"+voted+"</b>";
- beep(1200,400);
+function nextRound(){
+ result.classList.add('hidden');
+ setup.classList.remove('hidden');
 }
-</script>
-
-</body>
-</html>
+</script></body></html>
