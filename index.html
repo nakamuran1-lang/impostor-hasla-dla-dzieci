@@ -1,35 +1,40 @@
-<!doctype html>
-<html lang="pl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Impostor Kids - Sprint 1.1</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="card">
-<h1>🎭 Impostor Kids</h1>
+<!doctype html><html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Impostor Kids Sprint 1.2</title>
+<link rel="stylesheet" href="style.css"></head><body>
 
+<div id="setup" class="card">
+<h1>🎭 Impostor Kids</h1>
 <label>Gracze</label><br>
 <select id="playerCount"></select>
-
 <div id="players"></div>
-
-<label>Czas rundy</label><br>
-<select id="roundTime">
-<option value="120">2 min</option>
-<option value="180">3 min</option>
-<option value="300">5 min</option>
-</select>
-
-<br><br>
-
 <button id="startBtn">▶️ Start</button>
-<button id="clearBtn">🗑️ Wyczyść dane</button>
-
-<div id="message"></div>
 </div>
 
+<div id="passScreen" class="card hidden">
+<h2 id="passText"></h2>
+<p>🔒 Przesuń aby zobaczyć rolę</p>
+<input type="range" min="0" max="100" value="0" id="slider">
+</div>
+
+<div id="roleScreen" class="card hidden">
+<div id="roleContent"></div>
+<button id="hideBtn">🙈 Ukryj rolę</button>
+<button id="nextBtn">➡️ Następny gracz</button>
+</div>
+
+<div id="hiddenRole" class="card hidden">
+<h2>🙈 Rola ukryta</h2>
+<button id="showAgainBtn">👁️ Pokaż ponownie</button>
+<button id="nextBtn2">➡️ Następny gracz</button>
+</div>
+
+<div id="readyScreen" class="card hidden">
+<h1>🎭 Wszyscy gotowi?</h1>
+<button>▶️ Rozpocznij rundę</button>
+<button onclick="location.reload()">⚙️ Wróć do ustawień</button>
+</div>
+
+<script src="words.js"></script>
 <script src="app.js"></script>
-</body>
-</html>
+</body></html>
