@@ -1,1 +1,8 @@
-{"name":"Impostor Kids","short_name":"Impostor","display":"standalone"}
+{
+"name":"Impostor Kids",
+"short_name":"Impostor",
+"display":"standalone",
+"start_url":"./",
+"background_color":"#ffffff",
+"theme_color":"#2196f3"
+}
