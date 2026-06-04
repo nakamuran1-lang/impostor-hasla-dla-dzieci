@@ -1,8 +1,26 @@
 {
-"name":"Impostor Kids",
-"short_name":"Impostor",
-"display":"standalone",
-"start_url":"./",
-"background_color":"#ffffff",
-"theme_color":"#2196f3"
+  "name": "Impostor Kids 4.0",
+  "short_name": "Impostor Kids",
+  "description": "Imprezowa gra w impostora dla dzieci 5-10 lat.",
+  "lang": "pl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#fff7df",
+  "theme_color": "#ffda6b",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
