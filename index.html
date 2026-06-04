@@ -32,7 +32,7 @@
           <div class="panel hero-panel">
             <p class="round-pill" id="roundCounter">Runda 1</p>
             <h2 id="setupTitle">Kto dzisiaj gra?</h2>
-            <p class="muted">Wpisz od 3 do 9 imion, wybierz czas i zacznij rozdawanie ról.</p>
+            <p class="muted">Wpisz od 3 do 9 imion, wybierz czas, kategorię i zacznij rozdawanie ról.</p>
 
             <label class="field">
               <span>Liczba graczy</span>
@@ -47,6 +47,11 @@
               <button type="button" data-minutes="3" class="selected">3 min</button>
               <button type="button" data-minutes="5">5 min</button>
             </div>
+
+            <label class="field">
+              <span>Kategoria haseł</span>
+              <select id="categorySelect" aria-label="Wybierz kategorię haseł"></select>
+            </label>
 
             <button class="primary-action" id="startDeal" type="button">Rozdaj role</button>
           </div>
@@ -96,6 +101,23 @@
             <p class="round-pill">Głosowanie</p>
             <h2 id="voteTitle">Kto był impostorem?</h2>
             <div class="vote-list" id="voteList"></div>
+          </div>
+        </section>
+
+        <section class="screen" id="guessScreen" aria-labelledby="guessTitle">
+          <div class="panel focus-panel">
+            <p class="round-pill">Ostatnia szansa</p>
+            <h2 id="guessTitle">Impostor zgaduje hasło</h2>
+            <p class="muted"><strong id="guessImpostorName"></strong> został złapany, ale może jeszcze uratować rundę.</p>
+            <p class="category-callout" id="guessCategory"></p>
+            <label class="field">
+              <span>Jakie było hasło?</span>
+              <input id="impostorGuess" type="text" autocomplete="off" placeholder="Wpisz odpowiedź">
+            </label>
+            <div class="button-row">
+              <button class="secondary-action" id="skipGuess" type="button">Nie wiem</button>
+              <button class="primary-action" id="submitGuess" type="button">Sprawdź</button>
+            </div>
           </div>
         </section>
 

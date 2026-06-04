@@ -15,6 +15,7 @@ const state = {
   lastImpostor: null,
   lastStarter: null,
   category: "",
+  selectedCategory: "Losowa",
   word: "",
   timerId: null,
   secondsLeft: 180,
@@ -32,6 +33,7 @@ const screens = {
   deal: $("#dealScreen"),
   round: $("#roundScreen"),
   vote: $("#voteScreen"),
+  guess: $("#guessScreen"),
   result: $("#resultScreen"),
   stats: $("#statsScreen")
 };
@@ -46,6 +48,7 @@ function loadState() {
   state.stats = JSON.parse(localStorage.getItem(STORAGE_KEYS.stats) || "{}");
   state.minutes = savedSettings.minutes || 3;
   state.round = savedSettings.round || 1;
+  state.selectedCategory = savedSettings.selectedCategory || "Losowa";
   state.soundsEnabled = savedSettings.soundsEnabled !== false;
   state.theme = savedSettings.theme || "light";
 }
@@ -58,6 +61,7 @@ function saveSettings() {
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify({
     minutes: state.minutes,
     round: state.round,
+    selectedCategory: state.selectedCategory,
     soundsEnabled: state.soundsEnabled,
     theme: state.theme
   }));
@@ -127,6 +131,7 @@ function renderSetup() {
   $$(".segmented button").forEach((button) => {
     button.classList.toggle("selected", Number(button.dataset.minutes) === state.minutes);
   });
+  renderCategorySelect();
 
   const grid = $("#playersGrid");
   grid.innerHTML = "";
@@ -142,6 +147,16 @@ function renderSetup() {
     });
     grid.append(input);
   });
+}
+
+function renderCategorySelect() {
+  const select = $("#categorySelect");
+  const categories = ["Losowa", ...Object.keys(window.IMPOSTOR_WORDS)];
+  if (select.options.length !== categories.length) {
+    select.innerHTML = categories.map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("");
+  }
+  if (!categories.includes(state.selectedCategory)) state.selectedCategory = "Losowa";
+  select.value = state.selectedCategory;
 }
 
 function setPlayerCount(count) {
@@ -164,7 +179,9 @@ function randomIndex(length, forbiddenIndex) {
 
 function chooseRoundData() {
   const categories = Object.keys(window.IMPOSTOR_WORDS);
-  state.category = categories[Math.floor(Math.random() * categories.length)];
+  state.category = state.selectedCategory === "Losowa"
+    ? categories[Math.floor(Math.random() * categories.length)]
+    : state.selectedCategory;
   const words = window.IMPOSTOR_WORDS[state.category];
   state.word = words[Math.floor(Math.random() * words.length)];
   state.impostorIndex = randomIndex(state.players.length, state.lastImpostor);
@@ -272,8 +289,38 @@ function renderVote() {
 }
 
 function finishGame(chosenIndex) {
+  if (chosenIndex === state.impostorIndex) {
+    renderGuess();
+    showScreen("guess");
+    return;
+  }
+  finalizeRound("escaped");
+}
+
+function renderGuess() {
+  $("#guessImpostorName").textContent = state.players[state.impostorIndex];
+  $("#guessCategory").textContent = `Kategoria: ${state.category}`;
+  $("#impostorGuess").value = "";
+  setTimeout(() => $("#impostorGuess").focus(), 80);
+}
+
+function normalizeGuess(value) {
+  return value
+    .trim()
+    .toLocaleLowerCase("pl")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function submitImpostorGuess() {
+  const guessedCorrectly = normalizeGuess($("#impostorGuess").value) === normalizeGuess(state.word);
+  finalizeRound(guessedCorrectly ? "guessed" : "caught");
+}
+
+function finalizeRound(result) {
   // Punktacja jest czytelna dla dzieci: drużyna dostaje po punkcie albo impostor dostaje dwa.
-  const crewWon = chosenIndex === state.impostorIndex;
+  const crewWon = result === "caught";
   if (crewWon) {
     state.players.forEach((name, index) => {
       if (index !== state.impostorIndex) ensureStats(name).points += 1;
@@ -283,8 +330,13 @@ function finishGame(chosenIndex) {
   }
 
   saveStats();
-  $("#resultBadge").textContent = crewWon ? "Impostor złapany" : "Impostor uciekł";
-  $("#resultText").textContent = crewWon ? "Drużyna zdobywa punkty!" : "Impostor zdobywa 2 punkty!";
+  const messages = {
+    caught: ["Impostor złapany", "Drużyna zdobywa punkty!"],
+    escaped: ["Impostor uciekł", "Impostor zdobywa 2 punkty!"],
+    guessed: ["Impostor odgadł hasło", "Impostor ratuje rundę i zdobywa 2 punkty!"]
+  };
+  $("#resultBadge").textContent = messages[result][0];
+  $("#resultText").textContent = messages[result][1];
   $("#finalCategory").textContent = state.category;
   $("#finalWord").textContent = state.word;
   $("#finalImpostor").textContent = state.players[state.impostorIndex];
@@ -354,6 +406,10 @@ function bindEvents() {
       renderSetup();
     });
   });
+  $("#categorySelect").addEventListener("change", (event) => {
+    state.selectedCategory = event.target.value;
+    saveSettings();
+  });
   $("#startDeal").addEventListener("click", startDeal);
   $("#revealSlider").addEventListener("input", (event) => {
     if (Number(event.target.value) >= 98) revealRole();
@@ -367,6 +423,11 @@ function bindEvents() {
   $("#finishRound").addEventListener("click", () => {
     renderVote();
     showScreen("vote");
+  });
+  $("#submitGuess").addEventListener("click", submitImpostorGuess);
+  $("#skipGuess").addEventListener("click", () => finalizeRound("caught"));
+  $("#impostorGuess").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") submitImpostorGuess();
   });
   $("#nextRound").addEventListener("click", nextRound);
   $("#backToSetup").addEventListener("click", () => {
